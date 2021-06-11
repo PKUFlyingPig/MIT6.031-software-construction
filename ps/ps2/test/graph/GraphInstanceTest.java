@@ -78,7 +78,7 @@ public abstract class GraphInstanceTest {
 
         assertEquals("expect previous weight = 0", 0, G.set("aa", "bb", 1));
         assertEquals("expect previous weight = 1", 1, G.set("aa", "bb", 0));
-        assertEquals("expect previous weight = 0", 2, G.set("aa", "bb", 2));
+        assertEquals("expect previous weight = 0", 0, G.set("aa", "bb", 2));
     }
 
     @Test
