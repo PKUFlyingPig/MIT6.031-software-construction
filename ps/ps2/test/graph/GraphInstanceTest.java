@@ -79,6 +79,11 @@ public abstract class GraphInstanceTest {
         assertEquals("expect previous weight = 0", 0, G.set("aa", "bb", 1));
         assertEquals("expect previous weight = 1", 1, G.set("aa", "bb", 0));
         assertEquals("expect previous weight = 0", 0, G.set("aa", "bb", 2));
+
+        groundTruth.add("cc");
+        assertEquals("expect previous weight = 0", 0, G.set("aa", "cc", 3));
+        assertEquals("expect Graph has vertex 'cc' ",
+            groundTruth, G.vertices());
     }
 
     @Test

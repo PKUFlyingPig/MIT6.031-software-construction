@@ -55,15 +55,26 @@ public class ConcreteEdgesGraph implements Graph<String> {
         if (weight < 0) {
             throw new IllegalArgumentException("weight must be non-negative value");
         }
-        int idx;
-        for (idx = 0; idx < edges.size(); idx++) {
-            if (edges.get(idx).getFrom().equals(source) && edges.get(idx).getTo().equals(target)) {
-                break;
+
+        int idx = -1;
+        if (!vertices.contains(source)) {
+            // source does not exist
+            vertices.add(source);
+        } else if (!vertices.contains(target)) {
+            // target does not exist
+            vertices.add(target);
+        } else {
+            // check if edge exists
+            for (idx = 0; idx < edges.size(); idx++) {
+                if (edges.get(idx).getFrom().equals(source) && edges.get(idx).getTo()
+                    .equals(target)) {
+                    break;
+                }
             }
         }
 
         // the edge does not exist
-        if (idx == edges.size()) {
+        if (idx == edges.size() || idx == -1) {
             edges.add(new Edge(source, target, weight));
             return 0;
         }
