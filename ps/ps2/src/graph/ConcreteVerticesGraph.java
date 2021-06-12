@@ -16,9 +16,9 @@ import java.util.Set;
  * 
  * <p>PS2 instructions: you MUST use the provided rep.
  */
-public class ConcreteVerticesGraph implements Graph<String> {
+public class ConcreteVerticesGraph<L> implements Graph<L> {
     
-    private final List<Vertex> vertices = new ArrayList<>();
+    private final List<Vertex<L>> vertices = new ArrayList<>();
     
     // Abstraction function:
     //   vertices => Graph with these vertices
@@ -29,19 +29,19 @@ public class ConcreteVerticesGraph implements Graph<String> {
 
     public ConcreteVerticesGraph(){}
 
-    @Override public boolean add(String vertex) {
-        for (Vertex v : vertices) {
+    @Override public boolean add(L vertex) {
+        for (Vertex<L> v : vertices) {
             if (v.getLabel().equals(vertex))
                 return false;
         }
-        vertices.add(new Vertex(vertex));
+        vertices.add(new Vertex<L>(vertex));
         return true;
     }
     
-    @Override public int set(String source, String target, int weight) {
+    @Override public int set(L source, L target, int weight) {
         boolean findSource = false;
-        Vertex s = null;
-        for (Vertex v : vertices) {
+        Vertex<L> s = null;
+        for (Vertex<L> v : vertices) {
             if (v.getLabel().equals(source)) {
                 findSource = true;
                 s = v;
@@ -49,13 +49,13 @@ public class ConcreteVerticesGraph implements Graph<String> {
             }
         }
         if (!findSource) {
-            s = new Vertex(source);
+            s = new Vertex<L>(source);
             vertices.add(s);
         }
         return s.set(target, weight);
     }
     
-    @Override public boolean remove(String vertex) {
+    @Override public boolean remove(L vertex) {
         int idx;
         for (idx = 0; idx < vertices.size(); idx++) {
             if (vertices.get(idx).getLabel().equals(vertex)) {
@@ -64,7 +64,7 @@ public class ConcreteVerticesGraph implements Graph<String> {
         }
         if (idx == vertices.size()) return false;
         vertices.remove(idx);
-        for (Vertex v : vertices) {
+        for (Vertex<L> v : vertices) {
             if (v.targetAt(vertex)) {
                 v.set(vertex, 0);
             }
@@ -72,17 +72,17 @@ public class ConcreteVerticesGraph implements Graph<String> {
         return true;
     }
     
-    @Override public Set<String> vertices() {
-        Set<String> s = new HashSet<>();
-        for (Vertex v : vertices) {
+    @Override public Set<L> vertices() {
+        Set<L> s = new HashSet<>();
+        for (Vertex<L> v : vertices) {
             s.add(v.getLabel());
         }
         return s;
     }
     
-    @Override public Map<String, Integer> sources(String target) {
-        Map<String, Integer> s = new HashMap<>();
-        for (Vertex v : vertices) {
+    @Override public Map<L, Integer> sources(L target) {
+        Map<L, Integer> s = new HashMap<>();
+        for (Vertex<L> v : vertices) {
             if (v.targetAt(target)) {
                 s.put(v.getLabel(), v.targetWeight(target));
             }
@@ -90,18 +90,18 @@ public class ConcreteVerticesGraph implements Graph<String> {
         return s;
     }
     
-    @Override public Map<String, Integer> targets(String source) {
-        Map<String, Integer> t = new HashMap<>();
-        Vertex sourceV = null;
-        for (Vertex v : vertices) {
+    @Override public Map<L, Integer> targets(L source) {
+        Map<L, Integer> t = new HashMap<>();
+        Vertex<L> sourceV = null;
+        for (Vertex<L> v : vertices) {
             if (v.getLabel().equals(source)){
                 sourceV = v;
                 break;
             }
         }
         if (sourceV == null) return t;
-        Set<String> targetLabels = sourceV.getTargets();
-        for (String target : targetLabels) {
+        Set<L> targetLabels = sourceV.getTargets();
+        for (L target : targetLabels) {
             t.put(target, sourceV.targetWeight(target));
         }
         return t;
@@ -110,7 +110,7 @@ public class ConcreteVerticesGraph implements Graph<String> {
     @Override
     public String toString() {
         String out = "";
-        for (Vertex v : vertices) {
+        for (Vertex<L> v : vertices) {
             out += v.toString();
         }
         return out;
@@ -125,11 +125,11 @@ public class ConcreteVerticesGraph implements Graph<String> {
  * <p>PS2 instructions: the specification and implementation of this class is
  * up to you.
  */
-class Vertex {
+class Vertex <L>{
     
     // fields
-    private final Map<String, Integer> targets = new HashMap<>();
-    private String label;
+    private final Map<L, Integer> targets = new HashMap<>();
+    private L label;
 
     // Abstraction function:
     //   targets & label ==> vertex labelled with 'label' with all its targets and edge weight in 'targets'
@@ -144,7 +144,7 @@ class Vertex {
      * Create a new vertex.
      * @param label the label of the vertex
      */
-    public Vertex(String label) {
+    public Vertex(L label) {
         this.label = label;
     }
 
@@ -171,7 +171,7 @@ class Vertex {
      * @throws IllegalArgumentException when weight is negative
      * @return the previous weight of the edge, or zero if there is no such edge
      */
-    public int set(String label, int weight) {
+    public int set(L label, int weight) {
         if (weight < 0) {
             throw new IllegalArgumentException("weight must be nonnegative");
         }
@@ -195,7 +195,7 @@ class Vertex {
     /**
      * @return the label of this vertex.
      */
-    public String getLabel() {
+    public L getLabel() {
         return label;
     }
 
@@ -204,7 +204,7 @@ class Vertex {
      * @param target the label of the target vertex
      * @return true if there exists such edge and vice versa.
      */
-    public boolean targetAt(String target){
+    public boolean targetAt(L target){
         return targets.containsKey(target);
     }
 
@@ -214,7 +214,7 @@ class Vertex {
      * @return zero if the target is not in the targets, or
      * the weight of the edge from this vertex to target.
      */
-    public int targetWeight(String target) {
+    public int targetWeight(L target) {
         if (!targets.containsKey(target)) {
             return 0;
         }
@@ -224,14 +224,14 @@ class Vertex {
     /**
      * @return the set of the vertice which are directed from this vertex
      */
-    public Set<String> getTargets() {
+    public Set<L> getTargets() {
         return targets.keySet();
     }
 
     @Override
     public String toString() {
         String out = "";
-        for (Entry<String, Integer> entry : targets.entrySet()) {
+        for (Entry<L, Integer> entry : targets.entrySet()) {
             out += label;
             out += " ==> ";
             out += entry.getKey();
